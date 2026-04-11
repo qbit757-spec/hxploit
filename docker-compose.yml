@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:15-alpine
+    container_name: hxploit-db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -9,13 +10,16 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-academic_system}
     ports:
       - "5432:5432"
+    networks:
+      - hxploit_net
 
   backend:
     build: .
+    container_name: hxploit-backend
     volumes:
       - .:/app
     ports:
-      - "8000:8000"
+      - "8002:8000"
     environment:
       POSTGRES_SERVER: db
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -24,6 +28,12 @@ services:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db/academic_system
     depends_on:
       - db
+    networks:
+      - hxploit_net
 
 volumes:
   postgres_data:
+
+networks:
+  hxploit_net:
+    driver: bridge
