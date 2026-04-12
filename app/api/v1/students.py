@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from app.api import deps
 from app.schemas.student_schema import StudentCreate, StudentOut, StudentUpdate
 from app.db.models.student_model import Student
@@ -25,7 +26,10 @@ async def create_student(
     db.add(db_obj)
     await db.commit()
     await db.refresh(db_obj)
-    return db_obj
+    # Refresh with relationship
+    stmt = select(Student).where(Student.id == db_obj.id).options(selectinload(Student.campus))
+    result = await db.execute(stmt)
+    return result.scalars().first()
 
 @router.get("/", response_model=List[StudentOut])
 async def read_students(
@@ -35,7 +39,7 @@ async def read_students(
     campus_id: int = Query(None),
     current_user = Depends(deps.get_current_active_user)
 ):
-    stmt = select(Student).offset(skip).limit(limit)
+    stmt = select(Student).options(selectinload(Student.campus)).offset(skip).limit(limit)
     if campus_id:
         stmt = stmt.where(Student.campus_id == campus_id)
     
@@ -48,7 +52,9 @@ async def read_student(
     db: AsyncSession = Depends(deps.get_db),
     current_user = Depends(deps.get_current_active_user)
 ):
-    student = await db.get(Student, student_id)
+    stmt = select(Student).where(Student.id == student_id).options(selectinload(Student.campus))
+    result = await db.execute(stmt)
+    student = result.scalars().first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
     return student
