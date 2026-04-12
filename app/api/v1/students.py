@@ -39,7 +39,10 @@ async def read_students(
     campus_id: int = Query(None),
     current_user = Depends(deps.get_current_active_user)
 ):
-    stmt = select(Student).options(selectinload(Student.campus)).offset(skip).limit(limit)
+    stmt = select(Student).options(
+        selectinload(Student.campus),
+        selectinload(Student.attendances)
+    ).offset(skip).limit(limit)
     if campus_id:
         stmt = stmt.where(Student.campus_id == campus_id)
     
@@ -52,7 +55,10 @@ async def read_student(
     db: AsyncSession = Depends(deps.get_db),
     current_user = Depends(deps.get_current_active_user)
 ):
-    stmt = select(Student).where(Student.id == student_id).options(selectinload(Student.campus))
+    stmt = select(Student).where(Student.id == student_id).options(
+        selectinload(Student.campus),
+        selectinload(Student.attendances)
+    )
     result = await db.execute(stmt)
     student = result.scalars().first()
     if not student:

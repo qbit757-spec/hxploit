@@ -1,6 +1,7 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from app.schemas.campus_schema import CampusOut
+from app.schemas.attendance_schema import AttendanceOut
 
 class StudentBase(BaseModel):
     first_name: str
@@ -22,6 +23,7 @@ class StudentUpdate(BaseModel):
 class StudentOut(StudentBase):
     id: int
     campus: Optional[CampusOut] = None
+    attendances: List[AttendanceOut] = []
 
     class Config:
         from_attributes = True
