@@ -31,7 +31,7 @@ async def read_cycles(
 async def create_cycle(
     cycle_in: CycleCreate,
     db: AsyncSession = Depends(deps.get_db),
-    current_user = Depends(deps.check_admin_role)
+    current_user = Depends(deps.get_current_active_user)
 ):
     db_obj = Cycle(**cycle_in.model_dump())
     db.add(db_obj)
@@ -43,7 +43,7 @@ async def create_cycle(
 async def close_cycle(
     cycle_id: int,
     db: AsyncSession = Depends(deps.get_db),
-    current_user = Depends(deps.check_admin_role)
+    current_user = Depends(deps.get_current_active_user)
 ):
     cycle = await cycle_service.close_current_cycle(db, cycle_id)
     if not cycle:
