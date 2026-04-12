@@ -14,6 +14,7 @@ class CampusUpdate(BaseModel):
 
 class CampusOut(CampusBase):
     id: int
+    uuid: str
 
     class Config:
         from_attributes = True

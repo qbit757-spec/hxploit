@@ -7,8 +7,10 @@ class PostulationBase(BaseModel):
     last_name: str
     student_code: str
     career: str
-    campus_id: int
+    campus_id: Optional[int] = None
+    campus_uuid: Optional[str] = None
     cycle_id: Optional[int] = None
+    cycle_uuid: Optional[str] = None
 
 class PostulationCreate(PostulationBase):
     pass

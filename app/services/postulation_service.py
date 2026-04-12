@@ -10,6 +10,23 @@ class PostulationService:
     async def create_postulation(db: AsyncSession, postulation_in: dict):
         student_code = postulation_in["student_code"]
         
+        # Resolve UUIDs if present
+        campus_uuid = postulation_in.pop("campus_uuid", None)
+        cycle_uuid = postulation_in.pop("cycle_uuid", None)
+        
+        if campus_uuid:
+            from app.db.models.campus_model import Campus
+            stmt_campus = select(Campus.id).where(Campus.uuid == campus_uuid)
+            campus_id = (await db.execute(stmt_campus)).scalars().first()
+            if campus_id:
+                postulation_in["campus_id"] = campus_id
+        
+        if cycle_uuid:
+            stmt_cycle_uuid = select(Cycle.id).where(Cycle.uuid == cycle_uuid)
+            cycle_id = (await db.execute(stmt_cycle_uuid)).scalars().first()
+            if cycle_id:
+                postulation_in["cycle_id"] = cycle_id
+
         # 1. Obtener ciclo actual si no viene especificado
         if not postulation_in.get("cycle_id"):
             stmt_cycle = select(Cycle).where(Cycle.is_current == True)

@@ -11,6 +11,7 @@ class CycleCreate(CycleBase):
 
 class CycleOut(CycleBase):
     id: int
+    uuid: str
 
     class Config:
         from_attributes = True
