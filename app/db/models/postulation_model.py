@@ -17,8 +17,10 @@ class Postulation(Base):
     career = Column(String, nullable=False)
     
     campus_id = Column(Integer, ForeignKey("campuses.id"), nullable=False)
+    cycle_id = Column(Integer, ForeignKey("cycles.id"), nullable=True) # Ligado al ciclo de inscripción
     status = Column(String, default=PostulationStatus.PENDING)
     
-    observations = Column(String, nullable=True) # To store why it's flagged
+    observations = Column(String, nullable=True) # Para inasistencias previas
     
     campus = relationship("Campus")
+    cycle = relationship("Cycle")

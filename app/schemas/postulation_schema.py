@@ -8,6 +8,7 @@ class PostulationBase(BaseModel):
     student_code: str
     career: str
     campus_id: int
+    cycle_id: Optional[int] = None
 
 class PostulationCreate(PostulationBase):
     pass
