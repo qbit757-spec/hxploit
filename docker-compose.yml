@@ -8,8 +8,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-academic_system}
-    ports:
-      - "5432:5432"
+    # Quitamos ports para evitar conflictos en el servidor
     networks:
       - hxploit_net
 
