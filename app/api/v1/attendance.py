@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from app.api import deps
-from app.schemas.attendance_schema import AttendanceCreate, AttendanceOut
+from app.schemas.attendance_schema import AttendanceCreate, AttendanceOut, AttendanceUpdate
 from app.db.models.attendance_model import Attendance
 from app.db.models.cycle_model import Cycle
 from app.db.models.attendance_history_model import AttendanceHistory
@@ -65,3 +65,22 @@ async def get_attendance_report(
     
     result = await db.execute(stmt)
     return result.scalars().all()
+
+@router.patch("/{attendance_id}", response_model=AttendanceOut)
+async def update_attendance(
+    attendance_id: int,
+    attendance_update: AttendanceUpdate,
+    db: AsyncSession = Depends(deps.get_db),
+    current_user = Depends(deps.get_current_active_user)
+):
+    attendance = await db.get(Attendance, attendance_id)
+    if not attendance:
+        raise HTTPException(status_code=404, detail="Attendance record not found")
+    
+    if attendance_update.is_present is not None:
+        attendance.is_present = attendance_update.is_present
+        
+    db.add(attendance)
+    await db.commit()
+    await db.refresh(attendance)
+    return attendance
