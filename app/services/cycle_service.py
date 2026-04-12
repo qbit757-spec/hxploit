@@ -34,8 +34,8 @@ class CycleService:
                 student_id=row.id,
                 student_code=row.student_code,
                 cycle_name=cycle.name,
-                total_presences=row.presences,
-                total_absences=row.absences
+                total_present=row.presences,
+                total_absent=row.absences
             )
             db.add(history)
         
