@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -8,6 +8,15 @@ from app.db.models.cycle_model import Cycle
 from app.services.cycle_service import cycle_service
 
 router = APIRouter()
+
+# PUBLIC ENDPOINT
+@router.get("/public/current", response_model=Optional[CycleOut])
+async def read_current_cycle(
+    db: AsyncSession = Depends(deps.get_db)
+):
+    stmt = select(Cycle).where(Cycle.is_current == True)
+    result = await db.execute(stmt)
+    return result.scalars().first()
 
 @router.get("/", response_model=List[CycleOut])
 async def read_cycles(
