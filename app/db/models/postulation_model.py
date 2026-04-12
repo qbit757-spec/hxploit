@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, ForeignKey, Integer, Enum
+from sqlalchemy import Column, String, ForeignKey, Integer
+from sqlalchemy.orm import relationship
 import enum
 from app.db.base import Base
 
@@ -18,4 +19,6 @@ class Postulation(Base):
     campus_id = Column(Integer, ForeignKey("campuses.id"), nullable=False)
     status = Column(String, default=PostulationStatus.PENDING)
     
-    observations = Column(String, nullable=True) # To store why it's flagged (e.g., "3+ absences in previous cycle")
+    observations = Column(String, nullable=True) # To store why it's flagged
+    
+    campus = relationship("Campus")

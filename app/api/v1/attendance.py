@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from app.api import deps
 from app.schemas.attendance_schema import AttendanceCreate, AttendanceOut
 from app.db.models.attendance_model import Attendance
@@ -52,7 +53,11 @@ async def get_attendance_report(
     cycle_id: int = Query(None),
     current_user = Depends(deps.get_current_active_user)
 ):
-    stmt = select(Attendance)
+    stmt = select(Attendance).options(
+        selectinload(Attendance.student),
+        selectinload(Attendance.cycle),
+        selectinload(Attendance.campus)
+    )
     if campus_id:
         stmt = stmt.where(Attendance.campus_id == campus_id)
     if cycle_id:

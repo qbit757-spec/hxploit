@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from app.api import deps
 from app.schemas.postulation_schema import PostulationCreate, PostulationOut, PostulationReview
 from app.db.models.postulation_model import Postulation, PostulationStatus
@@ -17,7 +18,11 @@ async def public_register(
     db: AsyncSession = Depends(deps.get_db),
     postulation_in: PostulationCreate
 ):
-    return await postulation_service.create_postulation(db, postulation_in.model_dump())
+    postulation = await postulation_service.create_postulation(db, postulation_in.model_dump())
+    # Load relationship for response
+    stmt = select(Postulation).where(Postulation.id == postulation.id).options(selectinload(Postulation.campus))
+    result = await db.execute(stmt)
+    return result.scalars().first()
 
 # ADMIN ENDPOINTS
 @router.get("/", response_model=List[PostulationOut])
