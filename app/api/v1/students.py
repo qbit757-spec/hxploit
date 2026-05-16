@@ -26,8 +26,11 @@ async def create_student(
     db.add(db_obj)
     await db.commit()
     await db.refresh(db_obj)
-    # Refresh with relationship
-    stmt = select(Student).where(Student.id == db_obj.id).options(selectinload(Student.campus))
+    # Refresh with relationships
+    stmt = select(Student).where(Student.id == db_obj.id).options(
+        selectinload(Student.campus),
+        selectinload(Student.attendances)
+    )
     result = await db.execute(stmt)
     return result.scalars().first()
 
